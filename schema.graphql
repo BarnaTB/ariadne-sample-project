@@ -1,0 +1,36 @@
+type Book {
+    id: ID!
+    title: String!
+    author: String!
+    isbn: String!
+}
+
+# model to return a single book
+type BookResult {
+    success: Boolean!
+    errors: [String]
+    book: Book
+}
+
+# model to return multiple books
+type BooksResult {
+    success: Boolean
+    errors: [String]
+    books: [Book]
+}
+
+type Mutation {
+    createBook(title: String!, author: String!, isbn: String!): BookResult!
+    updateBookById(id: ID!, title: String!, author: String!, isbn: String!): BookResult!
+    deleteBookById(id: ID!): BookResult!
+}
+
+type Query {
+    getBooks: BooksResult!
+    getBookById(id: ID!): BookResult!
+}
+
+schema {
+    query: Query
+    mutation: Mutation
+}
