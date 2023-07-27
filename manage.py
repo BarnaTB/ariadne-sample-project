@@ -1,3 +1,5 @@
+import os
+
 from api import app, db
 
 from flask import jsonify, request
@@ -9,26 +11,29 @@ from ariadne import (load_schema_from_path,
                      snake_case_fallback_resolvers,
                      ObjectType)
 from ariadne.constants import CONTENT_TYPE_TEXT_HTML
-from api.queries import get_books_resolver
-from api.mutations import create_book_resolver
+from api.queries import get_books_resolver, get_book_by_id_resolver
+from api.mutations import create_book_resolver, delete_book_resolver
 
 
-cli = FlaskGroup(app)
+cli = FlaskGroup(app, set_debug_flag=os.getenv("DEBUG"))
 
 
 query = ObjectType("Query")
-
 mutation = ObjectType("Mutation")
 
 query.set_field("getBooks", get_books_resolver)
+query.set_field("getBookById", get_book_by_id_resolver)
 
 mutation.set_field("createBook", create_book_resolver)
+mutation.set_field("deleteBookById", delete_book_resolver)
 
 type_defs = load_schema_from_path("schema.graphql")
 
-schema = make_executable_schema(
-    type_defs, query, snake_case_fallback_resolvers
-    )
+schema = make_executable_schema(type_defs,
+                                query,
+                                mutation,
+                                snake_case_fallback_resolvers
+                                )
 
 
 @app.route("/graphql")
